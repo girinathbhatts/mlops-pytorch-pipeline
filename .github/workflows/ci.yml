@@ -1,0 +1,50 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+          pip install PyYAML Pillow fastapi uvicorn python-multipart
+          pip install pytest flake8
+
+      - name: Lint with flake8
+        run: |
+          flake8 src/ tests/ --max-line-length=120 --count --show-source --statistics
+
+      - name: Run tests
+        run: |
+          pytest tests/ -v
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build training image
+        run: docker build -f docker/Dockerfile.train -t mlops-train:ci .
+
+      - name: Build serving image
+        run: docker build -f docker/Dockerfile.serve -t mlops-serve:ci .
