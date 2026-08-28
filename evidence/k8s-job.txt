@@ -1,4 +1,4 @@
-﻿NAME               STATUS     COMPLETIONS   DURATION   AGE
+NAME               STATUS     COMPLETIONS   DURATION   AGE
 pytorch-training   Complete   1/1           15h        15h
 Name:             pytorch-training
 Namespace:        ml-training
@@ -27,8 +27,8 @@ Pod Template:
     Port:       <none>
     Host Port:  <none>
     Limits:
-      cpu:     4
-      memory:  6Gi
+      cpu:     2
+      memory:  4Gi
     Requests:
       cpu:        2
       memory:     4Gi
