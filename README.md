@@ -109,6 +109,7 @@ mlops-pytorch-pipeline/
 ├── evidence/
 │   ├── k8s-pods.txt                 # kubectl get pods output
 │   ├── k8s-deployment.txt           # kubectl describe deployment output
+│   ├── k8s-job.txt                  # kubectl get/describe job output
 │   ├── k8s-hpa.txt                  # kubectl get hpa output
 │   ├── k8s-storage.txt              # kubectl get pvc,pv output
 │   ├── k8s-service.txt              # kubectl get svc output
@@ -286,10 +287,10 @@ The outputs below were captured from an actual Minikube deployment. Full termina
 
 ### Kubernetes Pods
 ```
-NAME                            READY   STATUS    RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
-model-serving-998f4665b-6k4q2   1/1     Running   0          84s   10.244.0.5   minikube   <none>           <none>
-model-serving-998f4665b-ck4rb   1/1     Running   0          84s   10.244.0.6   minikube   <none>           <none>
-pytorch-training-s7pkl          1/1     Running   0          85s   10.244.0.4   minikube   <none>           <none>
+NAME                            READY   STATUS      RESTARTS   AGE
+model-serving-998f4665b-6k4q2   1/1     Running     0          15h
+model-serving-998f4665b-ck4rb   1/1     Running     0          15h
+pytorch-training-s7pkl          0/1     Completed   0          15h
 ```
 
 ### HPA Status
@@ -308,20 +309,20 @@ persistentvolumeclaim/data-pvc         Bound    pvc-df0a0b6e-7874-44e2-86de-dd6f
 
 ### Training Metrics
 ```json
-{"epoch": 1, "train_loss": 1.3748, "train_accuracy": 0.4942, "val_loss": 1.1071, "val_accuracy": 0.621}
-{"epoch": 2, "train_loss": 0.8804, "train_accuracy": 0.691, "val_loss": 0.7561, "val_accuracy": 0.7377}
-{"epoch": 3, "train_loss": 0.6877, "train_accuracy": 0.762, "val_loss": 0.6096, "val_accuracy": 0.792}
-{"epoch": 4, "train_loss": 0.5751, "train_accuracy": 0.802, "val_loss": 0.6119, "val_accuracy": 0.7889}
-{"epoch": 5, "train_loss": 0.501, "train_accuracy": 0.8261, "val_loss": 0.5661, "val_accuracy": 0.811}
-{"epoch": 6, "train_loss": 0.4455, "train_accuracy": 0.8466, "val_loss": 0.4717, "val_accuracy": 0.8413}
-{"epoch": 7, "train_loss": 0.4009, "train_accuracy": 0.86, "val_loss": 0.4224, "val_accuracy": 0.857}
-{"epoch": 8, "train_loss": 0.3647, "train_accuracy": 0.8732, "val_loss": 0.4138, "val_accuracy": 0.8619}
-{"epoch": 9, "train_loss": 0.3318, "train_accuracy": 0.8844, "val_loss": 0.399, "val_accuracy": 0.8675}
-{"epoch": 10, "train_loss": 0.3034, "train_accuracy": 0.8949, "val_loss": 0.4113, "val_accuracy": 0.8653}
-{"event": "training_complete", "best_val_loss": 0.399}
+{"epoch": 1, "train_loss": 1.3581, "train_accuracy": 0.5069, "val_loss": 1.3461, "val_accuracy": 0.5523}
+{"epoch": 2, "train_loss": 0.8717, "train_accuracy": 0.6926, "val_loss": 0.7355, "val_accuracy": 0.7432}
+{"epoch": 3, "train_loss": 0.6841, "train_accuracy": 0.7619, "val_loss": 0.7192, "val_accuracy": 0.7522}
+{"epoch": 4, "train_loss": 0.5723, "train_accuracy": 0.8022, "val_loss": 0.7295, "val_accuracy": 0.7671}
+{"epoch": 5, "train_loss": 0.5046, "train_accuracy": 0.825, "val_loss": 0.4988, "val_accuracy": 0.833}
+{"epoch": 6, "train_loss": 0.4455, "train_accuracy": 0.845, "val_loss": 0.4858, "val_accuracy": 0.8378}
+{"epoch": 7, "train_loss": 0.3994, "train_accuracy": 0.8629, "val_loss": 0.5426, "val_accuracy": 0.8172}
+{"epoch": 8, "train_loss": 0.3656, "train_accuracy": 0.8744, "val_loss": 0.4502, "val_accuracy": 0.8474}
+{"epoch": 9, "train_loss": 0.3286, "train_accuracy": 0.8878, "val_loss": 0.3931, "val_accuracy": 0.8711}
+{"epoch": 10, "train_loss": 0.3016, "train_accuracy": 0.8951, "val_loss": 0.3753, "val_accuracy": 0.878}
+{"event": "training_complete", "best_val_loss": 0.3753}
 ```
 
-Best validation accuracy: **86.75%** at epoch 9 (val_loss: 0.399).
+Best validation accuracy: **87.80%** at epoch 10 (val_loss: 0.3753).
 
 ### Inference via Kubernetes Service
 ```bash

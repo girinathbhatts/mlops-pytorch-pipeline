@@ -1,0 +1,58 @@
+﻿NAME               STATUS     COMPLETIONS   DURATION   AGE
+pytorch-training   Complete   1/1           15h        15h
+Name:             pytorch-training
+Namespace:        ml-training
+Selector:         batch.kubernetes.io/controller-uid=e2884233-10fa-41de-963f-7ced03ddf471
+Labels:           app=pytorch-training
+                  project=mlops-pytorch-pipeline
+Annotations:      <none>
+Parallelism:      1
+Completions:      1
+Completion Mode:  NonIndexed
+Suspend:          false
+Backoff Limit:    2
+Start Time:       Fri, 28 Aug 2026 04:06:00 +0530
+Completed At:     Fri, 28 Aug 2026 19:27:40 +0530
+Duration:         15h
+Pods Statuses:    0 Active (0 Ready) / 1 Succeeded / 0 Failed
+Pod Template:
+  Labels:  app=pytorch-training
+           batch.kubernetes.io/controller-uid=e2884233-10fa-41de-963f-7ced03ddf471
+           batch.kubernetes.io/job-name=pytorch-training
+           controller-uid=e2884233-10fa-41de-963f-7ced03ddf471
+           job-name=pytorch-training
+  Containers:
+   trainer:
+    Image:      mlops-train:v1
+    Port:       <none>
+    Host Port:  <none>
+    Limits:
+      cpu:     4
+      memory:  6Gi
+    Requests:
+      cpu:        2
+      memory:     4Gi
+    Environment:  <none>
+    Mounts:
+      /app/checkpoints from checkpoint-volume (rw)
+      /app/configs from config-volume (rw)
+      /app/data from data-volume (rw)
+  Volumes:
+   config-volume:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      training-config
+    Optional:  false
+   data-volume:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  data-pvc
+    ReadOnly:   false
+   checkpoint-volume:
+    Type:          PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:     checkpoint-pvc
+    ReadOnly:      false
+  Node-Selectors:  <none>
+  Tolerations:     <none>
+Events:
+  Type    Reason     Age   From            Message
+  ----    ------     ----  ----            -------
+  Normal  Completed  15s   job-controller  Job completed
