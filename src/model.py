@@ -4,7 +4,9 @@ import torch.nn as nn
 from torchvision import models
 
 
-def get_model(architecture: str = "resnet18", num_classes: int = 10) -> nn.Module:
+def get_model(
+    architecture: str = "resnet18", num_classes: int = 10
+) -> nn.Module:
     """Create and return a model based on the specified architecture.
 
     Args:
