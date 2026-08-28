@@ -1,4 +1,22 @@
 ﻿{"event": "training_start", "device": "cpu"}
 Files already downloaded and verified
 Files already downloaded and verified
-
+{"epoch": 1, "train_loss": 1.3581, "train_accuracy": 0.5069, "val_loss": 1.3461, "val_accuracy": 0.5523}
+{"event": "checkpoint_saved", "path": "/app/checkpoints/classifier_v1.pt"}
+{"epoch": 2, "train_loss": 0.8717, "train_accuracy": 0.6926, "val_loss": 0.7355, "val_accuracy": 0.7432}
+{"event": "checkpoint_saved", "path": "/app/checkpoints/classifier_v1.pt"}
+{"epoch": 3, "train_loss": 0.6841, "train_accuracy": 0.7619, "val_loss": 0.7192, "val_accuracy": 0.7522}
+{"event": "checkpoint_saved", "path": "/app/checkpoints/classifier_v1.pt"}
+{"epoch": 4, "train_loss": 0.5723, "train_accuracy": 0.8022, "val_loss": 0.7295, "val_accuracy": 0.7671}
+{"epoch": 5, "train_loss": 0.5046, "train_accuracy": 0.825, "val_loss": 0.4988, "val_accuracy": 0.833}
+{"event": "checkpoint_saved", "path": "/app/checkpoints/classifier_v1.pt"}
+{"epoch": 6, "train_loss": 0.4455, "train_accuracy": 0.845, "val_loss": 0.4858, "val_accuracy": 0.8378}
+{"event": "checkpoint_saved", "path": "/app/checkpoints/classifier_v1.pt"}
+{"epoch": 7, "train_loss": 0.3994, "train_accuracy": 0.8629, "val_loss": 0.5426, "val_accuracy": 0.8172}
+{"epoch": 8, "train_loss": 0.3656, "train_accuracy": 0.8744, "val_loss": 0.4502, "val_accuracy": 0.8474}
+{"event": "checkpoint_saved", "path": "/app/checkpoints/classifier_v1.pt"}
+{"epoch": 9, "train_loss": 0.3286, "train_accuracy": 0.8878, "val_loss": 0.3931, "val_accuracy": 0.8711}
+{"event": "checkpoint_saved", "path": "/app/checkpoints/classifier_v1.pt"}
+{"epoch": 10, "train_loss": 0.3016, "train_accuracy": 0.8951, "val_loss": 0.3753, "val_accuracy": 0.878}
+{"event": "checkpoint_saved", "path": "/app/checkpoints/classifier_v1.pt"}
+{"event": "training_complete", "best_val_loss": 0.3753}
