@@ -23,8 +23,8 @@ spec:
               cpu: "2"
               memory: 4Gi
             limits:
-              cpu: "4"
-              memory: 6Gi
+              cpu: "2"
+              memory: 4Gi
           volumeMounts:
             - name: config-volume
               mountPath: /app/configs

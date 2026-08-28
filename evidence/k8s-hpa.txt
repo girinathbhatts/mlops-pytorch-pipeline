@@ -1,0 +1,3 @@
+﻿NAME                REFERENCE                  TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+model-serving-hpa   Deployment/model-serving   cpu: <unknown>/70%   2         5         2          85s
+

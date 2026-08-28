@@ -39,6 +39,3 @@ assignment.pdf
 
 # Logs
 *.log
-
-# Validation output files (generated during E2E testing)
-validation_*.txt

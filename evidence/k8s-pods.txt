@@ -1,0 +1,5 @@
+﻿NAME                            READY   STATUS    RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
+model-serving-998f4665b-6k4q2   1/1     Running   0          84s   10.244.0.5   minikube   <none>           <none>
+model-serving-998f4665b-ck4rb   1/1     Running   0          84s   10.244.0.6   minikube   <none>           <none>
+pytorch-training-s7pkl          1/1     Running   0          85s   10.244.0.4   minikube   <none>           <none>
+

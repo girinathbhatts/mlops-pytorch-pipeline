@@ -1,0 +1,8 @@
+﻿NAME                                   STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+persistentvolumeclaim/checkpoint-pvc   Bound    pvc-ca0f1292-361b-4aa6-9c57-28627eef3f90   2Gi        RWO            standard       <unset>                 4m24s
+persistentvolumeclaim/data-pvc         Bound    pvc-df0a0b6e-7874-44e2-86de-dd6f2c4b58b3   5Gi        RWO            standard       <unset>                 4m24s
+
+NAME                                                        CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                        STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+persistentvolume/pvc-ca0f1292-361b-4aa6-9c57-28627eef3f90   2Gi        RWO            Delete           Bound    ml-training/checkpoint-pvc   standard       <unset>                          4m24s
+persistentvolume/pvc-df0a0b6e-7874-44e2-86de-dd6f2c4b58b3   5Gi        RWO            Delete           Bound    ml-training/data-pvc         standard       <unset>                          4m24s
+
