@@ -1,6 +1,6 @@
-# Production PyTorch MLOps Pipeline: Training & Serving on Kubernetes
+# PyTorch MLOps Pipeline — CIFAR-10 Training & Serving on Kubernetes
 
-[![CI/CD Pipeline](https://github.com/girinathbhatts/mlops-pytorch-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/girinathbhatts/mlops-pytorch-pipeline/actions/workflows/ci.yml)
+[![CI Pipeline](https://github.com/girinathbhatts/mlops-pytorch-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/girinathbhatts/mlops-pytorch-pipeline/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.5.1-EE4C2C.svg)](https://pytorch.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688.svg)](https://fastapi.tiangolo.com/)
@@ -9,55 +9,55 @@
 
 ---
 
-## 👨‍🎓 Student Details
-- **Student Name:** Girinath Bhatt S
+## Student Details
+- **Name:** Girinath Bhatt S
 - **Roll Number:** DA25M511
 - **Course:** MLOps (Term 3), IIT Madras
 - **Repository:** [https://github.com/girinathbhatts/mlops-pytorch-pipeline](https://github.com/girinathbhatts/mlops-pytorch-pipeline)
 
 ---
 
-## 📖 Executive Summary
+## Overview
 
-This repository contains an end-to-end, production-grade Machine Learning Operations (MLOps) pipeline designed for training and serving Deep Learning models (ResNet on CIFAR-10) using **PyTorch**, **Docker**, **Kubernetes (Minikube)**, and **GitHub Actions CI/CD**.
+This repository implements an end-to-end MLOps pipeline for training and serving a ResNet-18 image classifier on CIFAR-10. It covers the full deployment lifecycle — from local development with Git workflows, to containerized training and serving with Docker, to orchestrated deployment on Kubernetes (Minikube).
 
-### Key System Features
-- **PyTorch Training Engine:** ResNet architecture adapted for 32x32 CIFAR-10 image classification with validation metrics tracking, checkpointing, and early stopping.
-- **Production Serving API:** High-throughput FastAPI application exposing `/health` liveness checks and `/predict` multipart image inference endpoints returning predicted class names, confidence scores, and full class probability distributions.
-- **Multi-Stage Docker Containers:** Ultra-lean CPU-optimized containers with non-root security execution (`appuser`), pinned dependency constraints, and multi-stage build layers.
-- **Kubernetes Orchestration:** Cloud-native architecture utilizing Namespaces (`ml-training`), ConfigMaps for dynamic hyperparameter management, PersistentVolumeClaims (PVC) for shared checkpoint storage, Batch Training Jobs, RollingUpdate Deployments with liveness/readiness probes, ClusterIP Services, and Horizontal Pod Autoscalers (HPA).
-- **Automated CI/CD:** GitHub Actions workflows executing Flake8 linting, Pytest test suites (8 comprehensive unit & integration tests), and automated Docker container builds.
+### Features
+- **PyTorch training script:** ResNet-18 adapted for 32×32 CIFAR-10 images, with validation tracking, best-checkpoint saving, and early stopping.
+- **Model serving API:** FastAPI application exposing `/health` and `/predict` endpoints. Accepts an image and returns the predicted class, confidence score, and per-class probabilities.
+- **Docker containers:** Separate training and serving images with pinned dependencies. The serving image runs as a non-root user (`appuser`) and includes a `HEALTHCHECK`.
+- **Kubernetes deployment:** Namespace (`ml-training`), ConfigMap for hyperparameters, PersistentVolumeClaims for dataset and checkpoint storage, a batch training Job, a serving Deployment with liveness/readiness probes, a ClusterIP Service, and a Horizontal Pod Autoscaler.
+- **CI pipeline:** GitHub Actions workflow running Flake8 linting, Pytest (8 unit tests), and Docker image builds on every push/PR.
 
 ---
 
-## 🏗️ Architecture & Workflow
+## Architecture
 
 ```mermaid
 flowchart TD
-    subgraph Developer["💻 Development & CI/CD"]
-        Code["Codebase / Git Commits"] --> GitHub["GitHub Repository (origin)"]
-        GitHub --> GHA["GitHub Actions CI Pipeline"]
-        subgraph CI["CI Pipeline Stages"]
-            GHA --> Lint["Stage 1: Flake8 Linting"]
-            GHA --> Test["Stage 2: Pytest (8 Unit Tests)"]
-            GHA --> DockerBuild["Stage 3: Docker Images Build & Smoke Test"]
+    subgraph Developer["Development & CI"]
+        Code["Codebase / Git Commits"] --> GitHub["GitHub Repository"]
+        GitHub --> GHA["GitHub Actions CI"]
+        subgraph CI["CI Stages"]
+            GHA --> Lint["Flake8 Linting"]
+            GHA --> Test["Pytest (8 Unit Tests)"]
+            GHA --> DockerBuild["Docker Image Builds"]
         end
     end
 
-    subgraph Containerization["🐳 Docker Images"]
-        TrainImg["mlops-train:v1 (PyTorch Training Engine)"]
-        ServeImg["mlops-serve:v1 (FastAPI Model Serving)"]
+    subgraph Containerization["Docker Images"]
+        TrainImg["mlops-train:v1"]
+        ServeImg["mlops-serve:v1"]
     end
 
     DockerBuild --> TrainImg
     DockerBuild --> ServeImg
 
-    subgraph Kubernetes["☸️ Kubernetes Runtime (Namespace: ml-training)"]
+    subgraph Kubernetes["Kubernetes (Namespace: ml-training)"]
         CM["ConfigMap: training-config\n(lr: 0.001, batch_size: 64, epochs: 10)"]
-        DataPVC["PVC: data-pvc (5Gi RWO)\nCIFAR-10 Dataset Storage"]
-        CheckPVC["PVC: checkpoint-pvc (2Gi RWO)\nModel Checkpoint Storage"]
+        DataPVC["PVC: data-pvc (5Gi RWO)"]
+        CheckPVC["PVC: checkpoint-pvc (2Gi RWO)"]
 
-        subgraph K8sTraining["Batch Training Job"]
+        subgraph K8sTraining["Training Job"]
             Job["Job: pytorch-training"]
             JobPod["Pod: pytorch-training-xxxxx\n(mlops-train:v1)"]
             Job --> JobPod
@@ -68,33 +68,33 @@ flowchart TD
 
         JobPod -->|Saves classifier_v1.pt| CheckPVC
 
-        subgraph K8sServing["Model Serving Deployment"]
-            Deploy["Deployment: model-serving\n(Replicas: 2, RollingUpdate)"]
-            Pod1["Pod 1: model-serving-xxx (1/1 Running)"]
-            Pod2["Pod 2: model-serving-yyy (1/1 Running)"]
-            HPA["Horizontal Pod Autoscaler (HPA)\nMin: 2, Max: 5, Target CPU: 70%"]
-            Svc["ClusterIP Service: model-serving\nPort 80 -> TargetPort 8080"]
+        subgraph K8sServing["Serving Deployment"]
+            Deploy["Deployment: model-serving\n(2 replicas, RollingUpdate)"]
+            Pod1["Pod 1 (1/1 Running)"]
+            Pod2["Pod 2 (1/1 Running)"]
+            HPA["HPA\nMin: 2, Max: 5, CPU target: 70%"]
+            Svc["ClusterIP Service\nPort 80 -> 8080"]
 
             Deploy --> Pod1
             Deploy --> Pod2
-            HPA -.->|Autoscale| Deploy
-            CheckPVC -.->|Read-only Mount /app/checkpoints| Pod1
-            CheckPVC -.->|Read-only Mount /app/checkpoints| Pod2
+            HPA -.->|Scale target| Deploy
+            CheckPVC -.->|Read-only mount| Pod1
+            CheckPVC -.->|Read-only mount| Pod2
             Svc --> Pod1
             Svc --> Pod2
         end
 
-        subgraph ClientInference["Client Inference"]
-            Client["REST API Client / Port Forward (8080)"] --> Svc
+        subgraph Inference["Client"]
+            Client["Port-forward / curl"] --> Svc
             Svc -->|GET /health| HealthResp["{'status': 'healthy'}"]
-            Svc -->|POST /predict| PredictResp["{'predicted_class': 'bird', 'confidence': 0.3276, ...}"]
+            Svc -->|POST /predict| PredictResp["{'predicted_class': 'bird', ...}"]
         end
     end
 ```
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```
 mlops-pytorch-pipeline/
@@ -102,68 +102,68 @@ mlops-pytorch-pipeline/
 │   └── workflows/
 │       └── ci.yml                   # CI pipeline (lint, test, build)
 ├── configs/
-│   └── training_config.yaml         # Training hyperparameters configuration
+│   └── training_config.yaml         # Training hyperparameters
 ├── docker/
-│   ├── Dockerfile.train             # Training container image specification
-│   └── Dockerfile.serve             # Production serving container image
+│   ├── Dockerfile.train             # Multi-stage training image
+│   └── Dockerfile.serve             # Serving image (non-root)
+├── evidence/
+│   ├── k8s-pods.txt                 # kubectl get pods output
+│   ├── k8s-deployment.txt           # kubectl describe deployment output
+│   ├── k8s-hpa.txt                  # kubectl get hpa output
+│   ├── k8s-storage.txt              # kubectl get pvc,pv output
+│   ├── k8s-service.txt              # kubectl get svc output
+│   ├── k8s-training-logs.txt        # Training job logs
+│   └── k8s-inference.txt            # /health and /predict responses
 ├── k8s/
-│   ├── namespace.yaml               # 'ml-training' namespace
-│   ├── configmap.yaml               # Training hyperparameter configmap
-│   ├── pvc.yaml                     # PersistentVolumeClaims for data & checkpoints
-│   ├── training-job.yaml            # Kubernetes batch training job
-│   ├── serving-deployment.yaml      # Model serving deployment with probes
-│   ├── serving-service.yaml         # ClusterIP service for model serving
+│   ├── namespace.yaml               # ml-training namespace
+│   ├── configmap.yaml               # Training hyperparameter ConfigMap
+│   ├── pvc.yaml                     # PVCs for data & checkpoints
+│   ├── training-job.yaml            # Batch training Job
+│   ├── serving-deployment.yaml      # Serving Deployment with probes
+│   ├── serving-service.yaml         # ClusterIP Service
 │   └── hpa.yaml                     # Horizontal Pod Autoscaler
 ├── requirements/
-│   ├── train.txt                    # PyTorch training dependencies
-│   └── serve.txt                    # FastAPI serving dependencies
+│   ├── train.txt                    # Training dependencies (PyTorch, PyYAML)
+│   └── serve.txt                    # Serving dependencies (FastAPI, Uvicorn)
 ├── scripts/
-│   └── generate_test_image.py       # Helper to generate test inference PNG
+│   └── generate_test_image.py       # Generates a test PNG for inference
 ├── src/
-│   ├── __init__.py
-│   ├── dataset.py                   # CIFAR-10 dataset loading & transforms
-│   ├── model.py                     # ResNet PyTorch model architecture
+│   ├── dataset.py                   # CIFAR-10 data loading & transforms
+│   ├── model.py                     # ResNet model definition
 │   ├── serve.py                     # FastAPI serving application
-│   └── train.py                     # PyTorch training loop with checkpointing
+│   └── train.py                     # Training loop with checkpointing
 ├── tests/
-│   ├── conftest.py                  # Pytest fixtures & synthetic data
-│   └── test_model.py                # 8 comprehensive unit & integration tests
-├── .dockerignore                    # Docker build exclusion rules
-├── .gitignore                       # Git exclusion rules
-├── README.md                        # Project documentation
-├── test_image.png                   # Sample inference test image
-├── validation_deployment.txt        # Kubernetes deployment verification output
-├── validation_hpa.txt               # Kubernetes HPA verification output
-├── validation_inference.txt         # End-to-end inference verification output
-├── validation_pods.txt              # Kubernetes pods verification output
-├── validation_service.txt           # Kubernetes service verification output
-├── validation_storage.txt           # Kubernetes storage PVC verification output
-└── validation_training_logs.txt     # Kubernetes training job logs
+│   ├── conftest.py                  # Pytest path configuration
+│   └── test_model.py                # Unit tests for model and transforms
+├── .dockerignore
+├── .gitignore
+├── README.md
+├── REFLECTION.md                    # Write-up reflecting on key challenges
+└── test_image.png                   # Sample image for testing /predict
 ```
 
 ---
 
-## ⚡ Prerequisites & Installation
+## Prerequisites
 
-### System Requirements
 - **OS:** Windows 10/11, macOS, or Linux
-- **RAM:** Minimum 16 GB
-- **Tools:** Docker Desktop (v24.0+), Minikube (v1.34+), Kubectl (v1.30+), Python 3.11+
+- **RAM:** 16 GB recommended
+- **Tools:** Docker Desktop (v24.0+), Minikube (v1.34+), kubectl (v1.30+), Python 3.11+
 
-### Local Environment Setup
+### Local Setup
 ```bash
-# 1. Clone repository
+# Clone repository
 git clone https://github.com/girinathbhatts/mlops-pytorch-pipeline.git
 cd mlops-pytorch-pipeline
 
-# 2. Create and activate virtual environment
+# Create virtual environment
 python -m venv venv
 # Windows PowerShell:
 .\venv\Scripts\Activate.ps1
 # Linux/macOS:
 source venv/bin/activate
 
-# 3. Install dependencies
+# Install dependencies
 pip install --upgrade pip
 pip install -r requirements/train.txt
 pip install -r requirements/serve.txt
@@ -172,41 +172,40 @@ pip install pytest flake8 requests
 
 ---
 
-## 🧪 Testing & Code Quality
+## Testing & Code Quality
 
-Run linting and test suites locally:
 ```bash
-# Code style and syntax linting
+# Lint
 flake8 src/ tests/
 
-# Execute all unit and integration tests
+# Run unit tests
 pytest tests/ -v
 ```
 
-### Test Suite Summary (8/8 Passed)
-- `test_model_instantiation`: Verifies ResNet18 model initialization and parameter count.
-- `test_model_forward_pass_shape`: Verifies input tensor `(B, 3, 32, 32)` produces `(B, 10)` logits.
-- `test_dataset_loading`: Validates CIFAR-10 data loaders, batching, and tensor normalization.
-- `test_train_one_epoch_synthetic`: Tests the full training loop with backpropagation on synthetic batches.
-- `test_evaluate_synthetic`: Tests model evaluation and accuracy calculation.
-- `test_checkpoint_saving_and_loading`: Verifies `torch.save` and state dictionary deserialization.
-- `test_serve_health_endpoint`: Tests FastAPI `/health` endpoint status.
-- `test_serve_predict_endpoint`: Tests `/predict` with multipart image payload and response schema.
+### Test Suite (8/8 Passed)
+- `test_resnet18_creation` — Verifies ResNet-18 model instantiation.
+- `test_resnet18_output_shape` — Checks that input `(B, 3, 32, 32)` produces `(B, 10)` output.
+- `test_resnet34_creation` — Verifies ResNet-34 model instantiation.
+- `test_custom_num_classes` — Tests model with a different number of output classes.
+- `test_unknown_architecture_raises` — Ensures `ValueError` for unsupported architecture names.
+- `test_model_save_and_load` — Tests checkpoint save/load round-trip and output consistency.
+- `test_train_transforms` — Validates training augmentation pipeline has 4 transforms (flip, crop, tensor, normalize).
+- `test_eval_transforms` — Validates evaluation pipeline has 2 transforms (tensor, normalize).
 
 ---
 
-## 🐳 Docker Containerization
+## Docker Containerization
 
 ### Building Images
 ```bash
-# 1. Build training image
+# Build training image (multi-stage)
 docker build -f docker/Dockerfile.train -t mlops-train:v1 .
 
-# 2. Build serving image
+# Build serving image
 docker build -f docker/Dockerfile.serve -t mlops-serve:v1 .
 ```
 
-### Running Locally with Docker
+### Running Locally
 ```bash
 # Run training with mounted volumes
 docker run --rm \
@@ -221,7 +220,7 @@ docker run -d --name mlops-serve -p 8080:8080 \
 
 # Test endpoints
 curl http://localhost:8080/health
-python -c "import requests; print(requests.post('http://localhost:8080/predict', files={'image': open('test_image.png', 'rb')}).json())"
+curl -X POST -F "image=@test_image.png" http://localhost:8080/predict
 
 # Cleanup
 docker stop mlops-serve && docker rm mlops-serve
@@ -229,45 +228,63 @@ docker stop mlops-serve && docker rm mlops-serve
 
 ---
 
-## ☸️ Kubernetes Deployment (Minikube)
+## Kubernetes Deployment (Minikube)
 
 ### 1. Start Minikube & Load Images
 ```bash
 minikube start --driver=docker --cpus=4 --memory=6144 --disk-size=20g
 
-# Load local Docker images into Minikube cluster
+# Load local Docker images into Minikube
 minikube image load mlops-train:v1
 minikube image load mlops-serve:v1
 ```
 
-### 2. Apply Kubernetes Manifests
+### 2. Apply Manifests & Run Training
 ```bash
-# Create namespace, configs, and storage
+# Create namespace, ConfigMap, and storage
 kubectl apply -f k8s/namespace.yaml
 kubectl apply -f k8s/configmap.yaml
 kubectl apply -f k8s/pvc.yaml
 
-# Run batch training job
+# Start training job
 kubectl apply -f k8s/training-job.yaml
 
-# Deploy serving deployment, service, and HPA
+# Wait for training to complete before deploying serving
+kubectl wait --for=condition=complete job/pytorch-training -n ml-training --timeout=30m
+```
+
+### 3. Deploy Serving Layer
+```bash
+# Deploy serving only after training has finished
 kubectl apply -f k8s/serving-deployment.yaml
 kubectl apply -f k8s/serving-service.yaml
 kubectl apply -f k8s/hpa.yaml
 ```
 
-### 3. Verify Cluster Resources
+### 4. Verify Resources
 ```bash
 kubectl get all -n ml-training
 kubectl get pvc,pv -n ml-training
 kubectl get hpa -n ml-training
 ```
 
+### 5. Test Inference
+```bash
+# Port-forward the service
+kubectl port-forward svc/model-serving -n ml-training 8080:80
+
+# In another terminal:
+curl http://localhost:8080/health
+curl -X POST -F "image=@test_image.png" http://localhost:8080/predict
+```
+
 ---
 
-## 📊 Verification & Validation Results
+## Validation Results
 
-### 1. Kubernetes Pods Status (`kubectl get pods -n ml-training -o wide`)
+The outputs below were captured from an actual Minikube deployment. Full terminal logs are available in the [`evidence/`](evidence/) directory.
+
+### Kubernetes Pods
 ```
 NAME                            READY   STATUS    RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
 model-serving-998f4665b-6k4q2   1/1     Running   0          84s   10.244.0.5   minikube   <none>           <none>
@@ -275,20 +292,21 @@ model-serving-998f4665b-ck4rb   1/1     Running   0          84s   10.244.0.6   
 pytorch-training-s7pkl          1/1     Running   0          85s   10.244.0.4   minikube   <none>           <none>
 ```
 
-### 2. Horizontal Pod Autoscaler (`kubectl get hpa -n ml-training`)
+### HPA Status
 ```
 NAME                REFERENCE                  TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
 model-serving-hpa   Deployment/model-serving   cpu: <unknown>/70%   2         5         2          85s
 ```
+> **Note:** Minikube's metrics-server did not report CPU metrics during this run, so the HPA target shows `<unknown>`. The autoscaler is configured but dynamic CPU-based scaling was not observed.
 
-### 3. Persistent Volumes & PVCs (`kubectl get pvc,pv -n ml-training`)
+### Storage (PVCs)
 ```
 NAME                                   STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
 persistentvolumeclaim/checkpoint-pvc   Bound    pvc-ca0f1292-361b-4aa6-9c57-28627eef3f90   2Gi        RWO            standard       4m24s
 persistentvolumeclaim/data-pvc         Bound    pvc-df0a0b6e-7874-44e2-86de-dd6f2c4b58b3   5Gi        RWO            standard       4m24s
 ```
 
-### 4. Training Convergence & Metrics
+### Training Metrics
 ```json
 {"epoch": 1, "train_loss": 1.3748, "train_accuracy": 0.4942, "val_loss": 1.1071, "val_accuracy": 0.621}
 {"epoch": 2, "train_loss": 0.8804, "train_accuracy": 0.691, "val_loss": 0.7561, "val_accuracy": 0.7377}
@@ -303,21 +321,16 @@ persistentvolumeclaim/data-pvc         Bound    pvc-df0a0b6e-7874-44e2-86de-dd6f
 {"event": "training_complete", "best_val_loss": 0.399}
 ```
 
-### 5. Live Inference Verification via Kubernetes ClusterIP Service
-```bash
-# Port-forward service
-kubectl port-forward svc/model-serving -n ml-training 8080:80
+Best validation accuracy: **86.75%** at epoch 9 (val_loss: 0.399).
 
+### Inference via Kubernetes Service
+```bash
 # GET /health
-curl -X GET http://localhost:8080/health
-# Response:
-{
-  "status": "healthy"
-}
+curl http://localhost:8080/health
+{"status": "healthy"}
 
 # POST /predict
 curl -X POST -F "image=@test_image.png" http://localhost:8080/predict
-# Response:
 {
   "predicted_class": "bird",
   "confidence": 0.3276,
@@ -338,14 +351,13 @@ curl -X POST -F "image=@test_image.png" http://localhost:8080/predict
 
 ---
 
-## 🌟 Bonus Features Implemented
-1. **Horizontal Pod Autoscaler (HPA):** Auto-scales serving replicas (2 to 5) dynamically based on 70% CPU threshold (`k8s/hpa.yaml`).
-2. **Early Stopping with Checkpoint Rollback:** Automatically tracks validation loss across epochs and saves the optimal model checkpoint (`classifier_v1.pt`).
-3. **Structured JSON-Lines Logging:** Production observability with machine-parsable JSON events for monitoring training progress and loss metrics.
-4. **GPU-Ready Deployment Manifests:** Embedded GPU node selector, tolerations, and resource limit comments in `k8s/training-job.yaml` for instant cloud GPU execution.
+## Additional Features
+1. **Horizontal Pod Autoscaler (HPA):** Configured for 2–5 replicas targeting 70% CPU utilization (`k8s/hpa.yaml`). In the Minikube validation, metrics-server did not report CPU metrics, so dynamic scaling was not observed during testing.
+2. **Early stopping and best-checkpoint saving:** Training monitors validation loss and saves the best checkpoint to disk. If validation loss does not improve for 3 consecutive epochs, training stops early.
+3. **Structured JSON logging:** Training outputs one JSON object per epoch, making it straightforward to parse metrics programmatically.
+4. **GPU configuration template:** `k8s/training-job.yaml` includes commented GPU resource requests (`nvidia.com/gpu: 1`), node selector, and tolerations that can be uncommented for GPU-enabled clusters. GPU scheduling was not validated in the current Minikube environment.
 
 ---
 
-## 📄 License & Attribution
+## License & Attribution
 Developed by **Girinath Bhatt S** (Roll No: `DA25M511`) for the MLOps Course, IIT Madras.
-Code released under the MIT License.

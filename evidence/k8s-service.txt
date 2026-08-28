@@ -1,0 +1,3 @@
+﻿NAME            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+model-serving   ClusterIP   10.109.89.104   <none>        80/TCP    85s
+

@@ -1,0 +1,22 @@
+﻿GET /health:
+{
+  "status": "healthy"
+}
+
+POST /predict:
+{
+  "predicted_class": "bird",
+  "confidence": 0.3276,
+  "probabilities": {
+    "airplane": 0.0045,
+    "automobile": 0.1787,
+    "bird": 0.3276,
+    "cat": 0.0378,
+    "deer": 0.0009,
+    "dog": 0.0014,
+    "frog": 0.2062,
+    "horse": 0.001,
+    "ship": 0.0037,
+    "truck": 0.2381
+  }
+}
