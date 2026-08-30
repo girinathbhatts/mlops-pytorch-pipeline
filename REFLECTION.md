@@ -3,6 +3,9 @@
 **Student Name:** Girinath Bhatt S  
 **Roll Number:** DA25M511  
 **Course:** MLOps & Infrastructure for Machine Learning (Term 3), IIT Madras  
+**GitHub Repository:** https://github.com/girinathbhatts/mlops-pytorch-pipeline  
+**Final PR (Release to main):** https://github.com/girinathbhatts/mlops-pytorch-pipeline/pull/9  
+**Validation Evidence PR:** https://github.com/girinathbhatts/mlops-pytorch-pipeline/pull/8  
 
 ---
 
